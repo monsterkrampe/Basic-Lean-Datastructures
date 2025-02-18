@@ -1,0 +1,6 @@
+name = "BasicLeanDatastructures"
+version = "0.1.0"
+defaultTargets = ["BasicLeanDatastructures"]
+
+[[lean_lib]]
+name = "BasicLeanDatastructures"

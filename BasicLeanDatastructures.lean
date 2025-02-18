@@ -1,0 +1,9 @@
+import BasicLeanDatastructures.Fin
+import BasicLeanDatastructures.FiniteTree
+import BasicLeanDatastructures.List.Basic
+import BasicLeanDatastructures.List.EraseDupsKeepRight
+import BasicLeanDatastructures.List.Repeat
+import BasicLeanDatastructures.Option
+import BasicLeanDatastructures.Set.Basic
+import BasicLeanDatastructures.Set.Finite
+
