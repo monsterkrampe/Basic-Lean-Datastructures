@@ -28,32 +28,32 @@ namespace List
     exists e
 
   theorem sum_take_le_sum (l : List Nat) (i : Fin (l.length + 1)) : (l.take i.val).sum ≤ l.sum := by
-    induction l with 
+    induction l with
     | nil => simp
-    | cons hd tl ih => 
-      cases i using Fin.cases with 
+    | cons hd tl ih =>
+      cases i using Fin.cases with
       | zero => simp
       | succ i =>
         rw [List.take_cons (by simp), List.sum_cons, List.sum_cons]
         apply Nat.add_le_add_left
         apply ih ⟨i.val, i.isLt⟩
 
-  def enum_with_lt (l : List α) : List ((Fin l.length) × α) :=
-    l.enum.attach.map (fun ⟨pair, h⟩ => (⟨pair.fst, by apply List.fst_lt_of_mem_enum; exact h⟩, pair.snd))
+  def zipIdx_with_lt (l : List α) : List (α × (Fin l.length)) :=
+    l.zipIdx.attach.map (fun ⟨pair, h⟩ => (pair.fst, ⟨pair.snd, List.snd_lt_of_mem_zipIdx h⟩))
 
-  theorem length_enum_with_lt (l : List α) : l.enum_with_lt.length = l.length := by unfold enum_with_lt; simp
+  theorem length_zipIdx_with_lt (l : List α) : l.zipIdx_with_lt.length = l.length := by unfold zipIdx_with_lt; simp
 
-  theorem enum_with_lt_getElem_fst_eq_index {l : List α} {index : Nat} (h : index < l.length) : (l.enum_with_lt[index]'(by rw [length_enum_with_lt]; exact h)).fst = ⟨index, h⟩ := by
-    unfold enum_with_lt
+  theorem zipIdx_with_lt_getElem_fst_eq_getElem {l : List α} {index : Nat} (h : index < l.length) : (l.zipIdx_with_lt[index]'(by rw [length_zipIdx_with_lt]; exact h)).fst = l[index] := by
+    unfold zipIdx_with_lt
     simp
 
-  theorem enum_with_lt_getElem_snd_eq_getElem {l : List α} {index : Nat} (h : index < l.length) : (l.enum_with_lt[index]'(by rw [length_enum_with_lt]; exact h)).snd = l[index] := by
-    unfold enum_with_lt
+  theorem zipIdx_with_lt_getElem_snd_eq_index {l : List α} {index : Nat} (h : index < l.length) : (l.zipIdx_with_lt[index]'(by rw [length_zipIdx_with_lt]; exact h)).snd = ⟨index, h⟩ := by
+    unfold zipIdx_with_lt
     simp
 
-  theorem mem_enum_with_lt_iff_mem_enum {l : List α} : ∀ (i : Fin l.length) (el : α), (i, el) ∈ l.enum_with_lt ↔ (i.val, el) ∈ l.enum := by
+  theorem mem_zipIdx_with_lt_iff_mem_zipIdx {l : List α} : ∀ (i : Fin l.length) (el : α), (el, i) ∈ l.zipIdx_with_lt ↔ (el, i.val) ∈ l.zipIdx := by
     intro i el
-    unfold enum_with_lt
+    unfold zipIdx_with_lt
     simp
     constructor
     . intro h
@@ -63,10 +63,10 @@ namespace List
           exact h
     . intro h; exists i.val; exists h
 
-  theorem mk_mem_enum_with_lt_iff_getElem {l : List α} : ∀ (i : Fin l.length) (el : α), (i, el) ∈ l.enum_with_lt ↔ l[i.val] = el := by
+  theorem mk_mem_zipIdx_with_lt_iff_getElem {l : List α} : ∀ (i : Fin l.length) (el : α), (el, i) ∈ l.zipIdx_with_lt ↔ l[i.val] = el := by
     intro i el
-    rw [mem_enum_with_lt_iff_mem_enum]
-    rw [List.mk_mem_enum_iff_getElem?]
+    rw [mem_zipIdx_with_lt_iff_mem_zipIdx]
+    rw [List.mk_mem_zipIdx_iff_getElem?]
     simp
 
   def idx_of_with_count [DecidableEq α] {l : List α} {e : α} (e_in_l : e ∈ l) (c : Nat) : Fin (c + l.length) :=
@@ -155,31 +155,6 @@ namespace List
   theorem idx_of_eq_under_map [DecidableEq α] [DecidableEq β] {l : List α} {e : α} (he : e ∈ l) (f : α -> β) (hf : ∀ e', e' ∈ l.toSet ∧ f e = f e' -> e = e') : (l.idx_of he).val = ((l.map f).idx_of (by rw [List.mem_map]; exists e)).val := by
     apply idx_of_with_count_eq_under_map
     apply hf
-
-  theorem length_enumFrom (l : List α) (n : Nat) : (l.enumFrom n).length = l.length := by simp
-
-  theorem length_enum (l : List α) : l.enum.length = l.length := by simp
-
-  theorem get_enumFrom (l : List α) (n : Nat) (i : Fin l.length) : (l.enumFrom n).get ⟨i.val, (by rw [l.length_enumFrom n]; exact i.isLt)⟩ = (n + i.val, l.get i) := by
-    rw [← Option.some_inj, ← List.get?_eq_get]
-    induction l generalizing n with
-    | nil => have : i.val < 0 := i.isLt; contradiction
-    | cons a as ih => cases eq : i.val with
-      | zero => simp [get?, enumFrom]; rw [← Option.some_inj]; simp [eq]
-      | succ j =>
-        unfold enumFrom
-        unfold get?
-        let jFin : Fin as.length := ⟨j, (by have isLt := i.isLt; unfold length at isLt; rw [eq] at isLt; apply Nat.lt_of_succ_lt_succ; exact isLt)⟩
-        rw [ih (n+1) jFin]
-        simp
-        constructor
-        . rw [Nat.add_assoc, Nat.add_comm 1 j]
-        . rw [← Option.some_inj]; simp [eq, jFin]
-
-  theorem get_enum (l : List α) (i : Fin l.length) : l.enum.get ⟨i.val, (by rw [length_enum]; exact i.isLt)⟩ = (i.val, l.get i) := by
-    unfold enum
-    rw [get_enumFrom]
-    simp
 
   theorem neg_all_of_any_neg (l : List α) (p : α -> Bool) : l.any (fun a => ¬p a) -> ¬l.all p := by simp
 
