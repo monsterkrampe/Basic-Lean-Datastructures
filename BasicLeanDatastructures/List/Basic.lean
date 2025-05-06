@@ -309,7 +309,7 @@ namespace List
           . rw [List.length_cons] at len_lt
             exact len_lt
           . intro contra
-            rw [List.length_eq_zero] at contra
+            rw [List.length_eq_zero_iff] at contra
             rw [contra] at this
             simp at this
         . intro e e_mem
