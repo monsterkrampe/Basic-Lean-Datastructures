@@ -8,6 +8,31 @@ namespace Set
   def element (e : α) (X : Set α) : Prop := X e
   infixr:75 " ∈ " => element
 
+  theorem ext (X Y : Set α) : (∀ e, e ∈ X ↔ e ∈ Y) -> X = Y := by
+    intro h
+    apply funext
+    intro e
+    apply propext
+    specialize h e
+    exact h
+
+  theorem ext_iff (X Y : Set α) : (∀ e, e ∈ X ↔ e ∈ Y) ↔ X = Y := by
+    constructor
+    . apply ext
+    . intro h e; rw [h]
+
+  theorem not_empty_contains_element (X : Set α) : X ≠ ∅ -> ∃ e, e ∈ X := by
+    intro neq
+    apply Classical.byContradiction
+    intro contra
+    apply neq
+    apply ext
+    intro e
+    simp only [not_exists] at contra
+    specialize contra e
+    simp only [contra, false_iff]
+    simp [element, empty]
+
   theorem element_mapping_preserves_membership (e : α) (X : Set α) (f : α -> α) : e ∈ X -> f e ∈ (fun e' => ∃ e'', X e'' ∧ e' = f e'') := by
     intro helem
     exists e
