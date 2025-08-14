@@ -69,7 +69,7 @@ namespace Set
   theorem union_subset_iff_both_subset (a b c : Set α) : a ∪ b ⊆ c ↔ a ⊆ c ∧ b ⊆ c := by
     constructor
     . intro h
-      simp [union, subset] at h
+      simp [subset] at h
       simp [subset]
       constructor
       . intro e hl

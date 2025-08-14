@@ -90,7 +90,7 @@ namespace List
     have tmp_fin_isLt := tmp_fin.isLt
     ⟨tmp_fin.val, by simp at tmp_fin_isLt; exact tmp_fin_isLt⟩
 
-  theorem get_prepend_succ [DecidableEq α] (l : List α) (a : α) (i : Fin l.length) (j : Fin (a::l).length) (h : j = Fin.succ i) : l.get i = (a::l).get j := by rw [h]; simp [get]
+  theorem get_prepend_succ [DecidableEq α] (l : List α) (a : α) (i : Fin l.length) (j : Fin (a::l).length) (h : j = Fin.succ i) : l.get i = (a::l).get j := by rw [h]; simp
 
   theorem idx_of_prepend_succ [DecidableEq α] {l : List α} {e a : α} (e_in_l : e ∈ l) (h : e ≠ a) : ((a::l).idx_of (by right; trivial)) = Fin.succ (l.idx_of e_in_l) := by
     simp [idx_of, idx_of_with_count, h, Fin.succ]
@@ -101,7 +101,7 @@ namespace List
     | nil => contradiction
     | cons a as ih =>
       by_cases h : e = a
-      . simp [get, h, idx_of, idx_of_with_count]
+      . simp [h, idx_of, idx_of_with_count]
       . have e_in_as : e ∈ as := by
           cases e_in_l
           . contradiction
