@@ -1,8 +1,11 @@
 import BasicLeanDatastructures.Fin
 import BasicLeanDatastructures.FiniteTree
+import BasicLeanDatastructures.GetFreshInhabitant
+import BasicLeanDatastructures.List.AllListsOfLength
 import BasicLeanDatastructures.List.Basic
 import BasicLeanDatastructures.List.EraseDupsKeepRight
 import BasicLeanDatastructures.List.Repeat
+import BasicLeanDatastructures.Nat
 import BasicLeanDatastructures.Option
 import BasicLeanDatastructures.Set.Basic
 import BasicLeanDatastructures.Set.Finite

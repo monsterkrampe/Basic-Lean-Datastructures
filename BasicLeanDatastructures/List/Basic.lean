@@ -173,6 +173,27 @@ namespace List
           rw [(ih h tail).left]
         . exact (ih h tail).right
 
+  theorem append_eq_append_of_parts_eq (as bs cs ds : List α) : as = cs -> bs = ds -> as ++ bs = cs ++ ds := by
+    intro eq eq2
+    rw [eq, eq2]
+
+  theorem append_left_same_length_of_append_eq_append_of_right_same_length {as bs cs ds : List α} : as ++ bs = cs ++ ds -> bs.length = ds.length -> as.length = cs.length := by
+    induction as generalizing cs with
+    | nil => cases cs with | nil => simp | cons _ _ => simp only [List.nil_append]; intro eq eq2; rw [eq, Nat.eq_iff_le_and_ge] at eq2; have contra := eq2.left; simp only [List.length_append, List.length_cons] at contra; rw [Nat.add_assoc] at contra; apply False.elim; apply Nat.not_succ_le_self; rw [Nat.succ_eq_one_add]; exact Nat.le_of_add_left_le contra
+    | cons a as ih =>
+      cases cs with
+      | nil =>
+        intro eq eq2
+        have : (a :: as ++ bs).length = ([] ++ ds).length := by rw [eq]
+        simp only [List.nil_append, List.length_append, List.length_cons] at this
+        rw [Nat.add_assoc, eq2, Nat.eq_iff_le_and_ge] at this; apply False.elim; apply Nat.not_succ_le_self; rw [Nat.succ_eq_one_add]; exact Nat.le_of_add_left_le this.left
+      | cons c cs =>
+        intro eq eq2
+        rw [List.length_cons, @ih cs]
+        . simp
+        . rw [List.cons_append, List.cons_append, List.cons_eq_cons] at eq; exact eq.right
+        . exact eq2
+
   theorem get_eq_of_eq {as bs : List α} (h : as = bs) (idx : Fin as.length) : as.get idx = bs.get ⟨idx.val, (by rw [← h]; exact idx.isLt)⟩ := by
     cases h; rfl
 
@@ -326,6 +347,56 @@ namespace List
   theorem map_eq_of_eq {as bs : List α} : as = bs -> ∀ (f : α -> β), as.map f = bs.map f := by intro h f; rw [h]
 
   theorem flatten_eq_of_eq {as bs : List (List α)} : as = bs -> as.flatten = bs.flatten := by intro h; rw [h]
+
+  theorem getElem_eq_getElem_of_idx_eq {l : List α} {i j : Nat} {i_lt : i < l.length} (idx_eq : i = j) : l[i] = l[j] := by simp [idx_eq]
+
+  theorem getElem_idxOf_of_mem [BEq α] [LawfulBEq α] {l : List α} {e : α} (mem : e ∈ l) : l[l.idxOf e]'(by apply List.idxOf_lt_length_of_mem; exact mem) = e := by
+    induction l with
+    | nil => simp at mem
+    | cons hd tl ih =>
+      unfold List.idxOf
+      unfold List.findIdx
+      unfold List.findIdx.go
+      cases Decidable.em (hd == e) with
+      | inl eq => simp only [eq, cond_true]; rw [List.getElem_cons_zero]; apply LawfulBEq.eq_of_beq eq
+      | inr neq =>
+        simp only [neq, cond_false]
+        simp only [List.findIdx_cons.findIdx_go_succ]
+        rw [List.getElem_cons_succ]
+        apply ih
+        rw [List.mem_cons] at mem
+        cases mem with
+        | inl mem => rw [mem] at neq; simp at neq
+        | inr mem => exact mem
+
+  theorem idxOf_getElem [DecidableEq α] {l : List α} {i : Nat} {lt : i < l.length} (nodup : l.Nodup) : l.idxOf l[i] = i := by
+    induction l generalizing i with
+    | nil => simp at lt
+    | cons hd tl ih =>
+      rw [List.getElem_cons, List.idxOf_cons]
+      cases Decidable.em (i = 0) with
+      | inl i_eq => simp [i_eq]
+      | inr i_eq =>
+        rw [List.nodup_cons] at nodup
+        simp only [i_eq, ↓reduceDIte]
+        have i_lt_tl : i - 1 < tl.length := by
+          apply Nat.sub_one_lt_of_le
+          . apply Nat.zero_lt_of_ne_zero; exact i_eq
+          . apply Nat.le_of_lt_succ; exact lt
+        have : hd ≠ tl[i-1] := by
+          intro contra
+          apply nodup.left
+          rw [contra]
+          apply List.getElem_mem
+        have : ¬ hd == tl[i-1] := by
+          intro beq
+          apply this
+          apply LawfulBEq.eq_of_beq
+          exact beq
+        simp only [this, cond_false]
+        rw [ih]
+        . apply Nat.sub_one_add_one; exact i_eq
+        . exact nodup.right
 
 end List
 
