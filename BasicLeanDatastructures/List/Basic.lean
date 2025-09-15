@@ -12,10 +12,10 @@ namespace List
     | cons a as ih =>
       constructor
       . intro h_in; simp; cases h_in with
-        | inl h_in_head => left; unfold Set.element at h_in_head; rw [h_in_head]
+        | inl h_in_head => left; rw [h_in_head]
         | inr h_in_tail => right; rw [← ih]; exact h_in_tail
       . intro h_in; simp at h_in; cases h_in with
-        | inl h_in_head => left; unfold Set.element; rw [h_in_head]
+        | inl h_in_head => left; rw [h_in_head]; simp [Membership.mem]
         | inr h_in_tail => right; rw [ih]; exact h_in_tail
 
   theorem get_mem_toSet (l : List α) (i : Fin l.length) : l[i] ∈ l.toSet := by rw [mem_toSet]; simp

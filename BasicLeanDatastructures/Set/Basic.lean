@@ -1,12 +1,12 @@
 def Set (α) := α -> Prop
 
+instance : Membership α (Set α) where
+  mem S a := S a
+
 namespace Set
 
   def empty : Set α := fun _ => False
   notation:max "∅" => empty
-
-  def element (e : α) (X : Set α) : Prop := X e
-  infixr:75 " ∈ " => element
 
   theorem ext (X Y : Set α) : (∀ e, e ∈ X ↔ e ∈ Y) -> X = Y := by
     intro h
@@ -31,9 +31,11 @@ namespace Set
     simp only [not_exists] at contra
     specialize contra e
     simp only [contra, false_iff]
-    simp [element, empty]
+    simp [Membership.mem, empty]
 
-  theorem element_mapping_preserves_membership (e : α) (X : Set α) (f : α -> α) : e ∈ X -> f e ∈ (fun e' => ∃ e'', X e'' ∧ e' = f e'') := by
+  def map (X : Set α) (f : α -> α) : Set α := fun e => ∃ e', X e' ∧ e = f e'
+
+  theorem element_mapping_preserves_membership (e : α) (X : Set α) (f : α -> α) : e ∈ X -> f e ∈ X.map f := by
     intro helem
     exists e
 
@@ -69,25 +71,21 @@ namespace Set
   theorem union_subset_iff_both_subset (a b c : Set α) : a ∪ b ⊆ c ↔ a ⊆ c ∧ b ⊆ c := by
     constructor
     . intro h
-      simp [subset] at h
-      simp [subset]
+      simp only [subset] at h
+      simp only [subset]
       constructor
       . intro e hl
         apply h
-        simp [element]
         apply Or.inl
         exact hl
       . intro e hr
         apply h
-        simp [element]
         apply Or.inr
         exact hr
     . intro ⟨ha, hb⟩
       unfold Set.union
       unfold Set.subset
       intro e
-      unfold Set.element
-      simp
       intro h
       cases h
       . apply ha
