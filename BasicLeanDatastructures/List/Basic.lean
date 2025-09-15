@@ -355,13 +355,11 @@ namespace List
     | nil => simp at mem
     | cons hd tl ih =>
       unfold List.idxOf
-      unfold List.findIdx
-      unfold List.findIdx.go
+      simp only [List.findIdx_cons]
       cases Decidable.em (hd == e) with
       | inl eq => simp only [eq, cond_true]; rw [List.getElem_cons_zero]; apply LawfulBEq.eq_of_beq eq
       | inr neq =>
         simp only [neq, cond_false]
-        simp only [List.findIdx_cons.findIdx_go_succ]
         rw [List.getElem_cons_succ]
         apply ih
         rw [List.mem_cons] at mem
