@@ -1,12 +1,21 @@
-def Set (α) := α -> Prop
+def Set (α : Type u) := α -> Prop
+
+instance : EmptyCollection (Set α) where
+  emptyCollection := fun _ => False
 
 instance : Membership α (Set α) where
   mem S a := S a
 
-namespace Set
+instance : Union (Set α) where
+  union A B := fun e => e ∈ A ∨ e ∈ B
 
-  def empty : Set α := fun _ => False
-  notation:max "∅" => empty
+instance : HasSubset (Set α) where
+  Subset A B := ∀ e, e ∈ A -> e ∈ B
+
+instance : HasSSubset (Set α) where
+  SSubset A B := A ⊆ B ∧ ¬ B ⊆ A
+
+namespace Set
 
   theorem ext (X Y : Set α) : (∀ e, e ∈ X ↔ e ∈ Y) -> X = Y := by
     intro h
@@ -31,19 +40,13 @@ namespace Set
     simp only [not_exists] at contra
     specialize contra e
     simp only [contra, false_iff]
-    simp [Membership.mem, empty]
+    simp [Membership.mem, EmptyCollection.emptyCollection]
 
   def map (X : Set α) (f : α -> α) : Set α := fun e => ∃ e', X e' ∧ e = f e'
 
   theorem element_mapping_preserves_membership (e : α) (X : Set α) (f : α -> α) : e ∈ X -> f e ∈ X.map f := by
     intro helem
     exists e
-
-  def union (X Y : Set α) : Set α := fun e => e ∈ X ∨ e ∈ Y
-  infixr:65 " ∪ " => union
-
-  def subset (X Y : Set α) : Prop := ∀ e : α, e ∈ X -> e ∈ Y
-  infixr:50 " ⊆ " => subset
 
   theorem subset_refl (X : Set α) : X ⊆ X := by
     intros _ h
@@ -71,8 +74,6 @@ namespace Set
   theorem union_subset_iff_both_subset (a b c : Set α) : a ∪ b ⊆ c ↔ a ⊆ c ∧ b ⊆ c := by
     constructor
     . intro h
-      simp only [subset] at h
-      simp only [subset]
       constructor
       . intro e hl
         apply h
@@ -83,8 +84,6 @@ namespace Set
         apply Or.inr
         exact hr
     . intro ⟨ha, hb⟩
-      unfold Set.union
-      unfold Set.subset
       intro e
       intro h
       cases h
