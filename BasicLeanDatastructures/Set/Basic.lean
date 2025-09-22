@@ -42,7 +42,7 @@ namespace Set
     simp only [contra, false_iff]
     simp [Membership.mem, EmptyCollection.emptyCollection]
 
-  def map (X : Set α) (f : α -> α) : Set α := fun e => ∃ e', X e' ∧ e = f e'
+  def map (X : Set α) (f : α -> β) : Set β := fun e => ∃ e', X e' ∧ e = f e'
 
   theorem element_mapping_preserves_membership (e : α) (X : Set α) (f : α -> α) : e ∈ X -> f e ∈ X.map f := by
     intro helem
