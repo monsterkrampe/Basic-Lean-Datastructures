@@ -44,11 +44,11 @@ namespace Set
 
   def map (X : Set α) (f : α -> β) : Set β := fun e => ∃ e', e' ∈ X ∧ e = f e'
 
-  theorem element_mapping_preserves_membership (e : α) (X : Set α) (f : α -> α) : e ∈ X -> f e ∈ X.map f := by
-    intro helem
+  theorem mem_map_of_mem {e : α} {X : Set α} {f : α -> β} : e ∈ X -> f e ∈ X.map f := by
+    intros
     exists e
 
-  theorem subset_refl (X : Set α) : X ⊆ X := by
+  theorem subset_refl {X : Set α} : X ⊆ X := by
     intros _ h
     exact h
 

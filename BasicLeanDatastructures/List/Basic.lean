@@ -2,30 +2,36 @@ import BasicLeanDatastructures.Set.Basic
 import BasicLeanDatastructures.Option
 
 namespace List
-  def toSet : List α -> Set α
-  | .nil => ∅
-  | .cons h tail => (fun e => e = h) ∪ (List.toSet tail)
+  def toSet (l : List α) : Set α := fun e => e ∈ l
 
   theorem mem_toSet {l : List α} {e : α} : e ∈ l.toSet ↔ e ∈ l := by
-    induction l with
-    | nil => constructor <;> (intros; contradiction)
-    | cons a as ih =>
-      constructor
-      . intro h_in; simp; cases h_in with
-        | inl h_in_head => left; rw [h_in_head]
-        | inr h_in_tail => right; rw [← ih]; exact h_in_tail
-      . intro h_in; simp at h_in; cases h_in with
-        | inl h_in_head => left; rw [h_in_head]; simp [Membership.mem]
-        | inr h_in_tail => right; rw [ih]; exact h_in_tail
+    simp [toSet, Membership.mem]
 
-  theorem get_mem_toSet (l : List α) (i : Fin l.length) : l[i] ∈ l.toSet := by rw [mem_toSet]; simp
+  theorem getElem_mem_toSet (l : List α) (i : Fin l.length) : l[i] ∈ l.toSet := by rw [mem_toSet]; apply List.getElem_mem
+
+  theorem map_toSet_eq_toSet_map {l : List α} {f : α -> β} : l.toSet.map f = (l.map f).toSet := by
+    apply Set.ext
+    intro e
+    constructor
+    . intro e_mem
+      rcases e_mem with ⟨e', e'_mem, eq⟩
+      rw [List.mem_toSet, eq]
+      apply List.mem_map_of_mem
+      rw [List.mem_toSet] at e'_mem
+      exact e'_mem
+    . intro e_mem
+      rw [List.mem_toSet, List.mem_map] at e_mem
+      rcases e_mem with ⟨e', e'_mem, eq⟩
+      rw [← eq]
+      apply Set.mem_map_of_mem
+      rw [List.mem_toSet]
+      exact e'_mem
 
   theorem mem_toSet_map_of_mem_toSet {l : List α} {e : α} {f : α -> β} : e ∈ l.toSet -> f e ∈ (l.map f).toSet := by
-    intro h
-    rw [mem_toSet] at h
-    rw [mem_toSet]
-    rw [List.mem_map]
-    exists e
+    intro mem
+    rw [← map_toSet_eq_toSet_map]
+    apply Set.mem_map_of_mem
+    exact mem
 
   theorem sum_take_le_sum (l : List Nat) (i : Fin (l.length + 1)) : (l.take i.val).sum ≤ l.sum := by
     induction l with
@@ -69,93 +75,6 @@ namespace List
     rw [List.mk_mem_zipIdx_iff_getElem?]
     simp
 
-  def idx_of_with_count [DecidableEq α] {l : List α} {e : α} (e_in_l : e ∈ l) (c : Nat) : Fin (c + l.length) :=
-    match l with
-    | .nil => by contradiction
-    | .cons h tail => if eq : e == h then ⟨c, by simp⟩ else
-      let res := tail.idx_of_with_count (by cases e_in_l; simp at eq; assumption) (c + 1)
-      ⟨res.val, by simp [length]; rw [@Nat.add_comm tail.length 1, ← Nat.add_assoc]; exact res.isLt⟩
-
-  theorem idx_of_with_count_succ [DecidableEq α] {l : List α} {e : α} (e_in_l : e ∈ l) (c : Nat) : (idx_of_with_count e_in_l (c + 1)).val = (idx_of_with_count e_in_l c).val + 1 := by
-    induction l generalizing c with
-    | nil => contradiction
-    | cons b bs ih =>
-      unfold idx_of_with_count
-      by_cases e == b
-      case pos hl => simp [hl]
-      case neg hr => simp [hr]; apply ih
-
-  def idx_of [DecidableEq α] {l : List α} {e : α} (e_in_l : e ∈ l) : Fin l.length :=
-    let tmp_fin := l.idx_of_with_count e_in_l 0
-    have tmp_fin_isLt := tmp_fin.isLt
-    ⟨tmp_fin.val, by simp at tmp_fin_isLt; exact tmp_fin_isLt⟩
-
-  theorem get_prepend_succ [DecidableEq α] (l : List α) (a : α) (i : Fin l.length) (j : Fin (a::l).length) (h : j = Fin.succ i) : l.get i = (a::l).get j := by rw [h]; simp
-
-  theorem idx_of_prepend_succ [DecidableEq α] {l : List α} {e a : α} (e_in_l : e ∈ l) (h : e ≠ a) : ((a::l).idx_of (by right; trivial)) = Fin.succ (l.idx_of e_in_l) := by
-    simp [idx_of, idx_of_with_count, h, Fin.succ]
-    apply idx_of_with_count_succ
-
-  theorem idx_of_get [DecidableEq α] {l : List α} {e : α} (e_in_l : e ∈ l) (isLt : (l.idx_of e_in_l < l.length)) : e = l.get ⟨(l.idx_of e_in_l).val, isLt⟩ := by
-    induction l with
-    | nil => contradiction
-    | cons a as ih =>
-      by_cases h : e = a
-      . simp [h, idx_of, idx_of_with_count]
-      . have e_in_as : e ∈ as := by
-          cases e_in_l
-          . contradiction
-          . trivial
-        have isLt_as : (as.idx_of e_in_as).val < as.length := by
-          exact (as.idx_of e_in_as).isLt
-        have ih_plugged_in := ih e_in_as isLt_as
-        apply Eq.trans
-        exact ih_plugged_in
-        rw [get_prepend_succ as a (as.idx_of e_in_as) ((a::as).idx_of e_in_l) (idx_of_prepend_succ e_in_as h)]
-
-  theorem idx_of_with_count_eq_of_list_eq [DecidableEq α] {l l' : List α} (h : l = l') {e : α} (he : e ∈ l) : ∀ c, (l.idx_of_with_count he c).val = (l'.idx_of_with_count (by rw [← h]; exact he) c).val := by
-    cases l with
-    | nil => cases l'; simp; contradiction
-    | cons head tail => cases l' with
-      | nil => contradiction
-      | cons head' tail' =>
-        have heads_eq : head = head' := by injection h
-        have tails_eq : tail = tail' := by injection h
-        simp [idx_of_with_count]
-        split
-        case isTrue he => simp [he, heads_eq]
-        case isFalse he => simp [heads_eq] at he; simp [he]; intro c; apply idx_of_with_count_eq_of_list_eq; apply tails_eq
-
-  theorem idx_of_eq_of_list_eq [DecidableEq α] {l l' : List α} (h : l = l') {e : α} (he : e ∈ l) : (l.idx_of he).val = (l'.idx_of (by rw [← h]; exact he)).val := by
-    apply idx_of_with_count_eq_of_list_eq
-    apply h
-
-  theorem idx_of_with_count_eq_under_map [DecidableEq α] [DecidableEq β] {l : List α} {e : α} (he : e ∈ l) (f : α -> β) (hf : ∀ e', e' ∈ l.toSet ∧ f e = f e' -> e = e') : ∀ c, (l.idx_of_with_count he c).val = ((l.map f).idx_of_with_count (by rw [List.mem_map]; exists e) c).val := by
-    induction l with
-    | nil => contradiction
-    | cons head tail ih =>
-      intro c
-      simp [idx_of_with_count]
-      split
-      case isTrue he => simp [he]
-      case isFalse he =>
-        have : ¬ f e = f head := by
-          intro hcontra;
-          have : e = head := by apply hf; constructor; unfold toSet; apply Or.inl; rfl; apply hcontra
-          contradiction
-        simp [this]
-        apply ih
-        intro e' ⟨e'InTail, feEqfe'⟩
-        apply hf
-        constructor
-        apply Or.inr
-        apply e'InTail
-        apply feEqfe'
-
-  theorem idx_of_eq_under_map [DecidableEq α] [DecidableEq β] {l : List α} {e : α} (he : e ∈ l) (f : α -> β) (hf : ∀ e', e' ∈ l.toSet ∧ f e = f e' -> e = e') : (l.idx_of he).val = ((l.map f).idx_of (by rw [List.mem_map]; exists e)).val := by
-    apply idx_of_with_count_eq_under_map
-    apply hf
-
   theorem neg_all_of_any_neg (l : List α) (p : α -> Bool) : l.any (fun a => ¬p a) -> ¬l.all p := by simp
 
   theorem append_args_eq_of_append_eq_of_same_length {as bs cs ds : List α} (h : as.length = cs.length) : as ++ bs = cs ++ ds -> as = cs ∧ bs = ds := by
@@ -193,9 +112,6 @@ namespace List
         . simp
         . rw [List.cons_append, List.cons_append, List.cons_eq_cons] at eq; exact eq.right
         . exact eq2
-
-  theorem get_eq_of_eq {as bs : List α} (h : as = bs) (idx : Fin as.length) : as.get idx = bs.get ⟨idx.val, (by rw [← h]; exact idx.isLt)⟩ := by
-    cases h; rfl
 
   theorem head_cons_tail_of_ne_nil {l : List α} (h : l ≠ []) : l = (l.head h) :: l.tail := by
     cases l with
