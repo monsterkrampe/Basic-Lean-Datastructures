@@ -107,20 +107,20 @@ instance [DecidableEq α] [DecidableEq β] (a b : FiniteTree α β) : Decidable 
 namespace FiniteTree
 
   def depth : FiniteTree α β -> Nat
-    | FiniteTree.leaf _ => 1
-    | FiniteTree.inner _ ts => 1 + (ts.map depth).max?.getD 0
+  | FiniteTree.leaf _ => 1
+  | FiniteTree.inner _ ts => 1 + (ts.map depth).max?.getD 1
 
   def leaves : FiniteTree α β -> List β
-    | FiniteTree.leaf b => List.cons b List.nil
-    | FiniteTree.inner _ ts => ts.flatMap leaves
+  | FiniteTree.leaf b => List.cons b List.nil
+  | FiniteTree.inner _ ts => ts.flatMap leaves
 
   def innerLabels : FiniteTree α β -> List α
   | .leaf _ => []
   | .inner a ts => a :: ts.flatMap innerLabels
 
   def mapLeaves (f : β -> FiniteTree α γ) (t : FiniteTree α β) : FiniteTree α γ := match t with
-    | FiniteTree.leaf b => f b
-    | FiniteTree.inner a ts => FiniteTree.inner a (ts.map (mapLeaves f))
+  | FiniteTree.leaf b => f b
+  | FiniteTree.inner a ts => FiniteTree.inner a (ts.map (mapLeaves f))
 
   theorem mapLeaves_eq_of_map_leaves_eq (f : β -> FiniteTree α γ) (g : β -> FiniteTree α γ) (t : FiniteTree α β) : t.leaves.map f = t.leaves.map g -> t.mapLeaves f = t.mapLeaves g := by
     induction t with
@@ -150,14 +150,14 @@ namespace FiniteTree
           exact t_mem
 
   def nodeLabel : FiniteTree α α -> α
-    | FiniteTree.leaf a => a
-    | FiniteTree.inner a _ => a
+  | FiniteTree.leaf a => a
+  | FiniteTree.inner a _ => a
 
   -- check that f holds for each node in the tree
   def forEach (t : FiniteTree α β) (f : (FiniteTree α β) -> Prop) : Prop :=
     match t with
-      | FiniteTree.leaf _ => f t
-      | FiniteTree.inner _ ts => (f t) ∧ (∀ t ∈ ts, f t)
+    | FiniteTree.leaf _ => f t
+    | FiniteTree.inner _ ts => (f t) ∧ (∀ t ∈ ts, f t)
 
   def privateNodesInDepthK (t : FiniteTree α β) (depth : Nat) (currentDepth : Nat) : List (FiniteTree α β) :=
     if (currentDepth > depth) then [] else
