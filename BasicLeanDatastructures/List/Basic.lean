@@ -1,6 +1,12 @@
 import BasicLeanDatastructures.Set.Basic
 import BasicLeanDatastructures.Option
 
+def List.decidableEqNil : (l : List α) -> Decidable (l = [])
+| .nil => .isTrue rfl
+| .cons hd tl => .isFalse (by simp)
+
+instance (l : List α) : Decidable (l = []) := l.decidableEqNil
+
 namespace List
   def toSet (l : List α) : Set α := fun e => e ∈ l
 
