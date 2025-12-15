@@ -39,7 +39,7 @@ def Nat.fresh (l : List Nat) : { n : Nat // n ∉ l} :=
   ⟨(l.max?.getD 0).succ, by
     intro contra
     have le : (l.max?.getD 0).succ ≤ l.max?.getD 0 := List.le_max?_getD_of_mem contra
-    rw [Nat.succ_le] at le
+    rw [Nat.succ_le_iff] at le
     simp at le
   ⟩
 

@@ -200,7 +200,7 @@ namespace List
         rw [List.getElem?_eq_getElem le] at h
         rw [List.getElem?_eq_getElem le'] at h
         simp at h
-        apply Subtype.eq
+        apply Subtype.ext
         exact h
     . intro h
       rw [h]
