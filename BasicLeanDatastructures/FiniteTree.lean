@@ -28,15 +28,15 @@ mutual
               | FiniteTree.inner a b => absurd rfl (hx a b)
             intro contra
             have : la = lb := by
-              have ha : la = unwrap (FiniteTree.leaf la) (by intro _ _ contra; exact FiniteTree.noConfusion contra) := by rfl
-              have hb : lb = unwrap (FiniteTree.leaf lb) (by intro _ _ contra; exact FiniteTree.noConfusion contra) := by rfl
+              have ha : la = unwrap (FiniteTree.leaf la) (by intro _ _ contra; simp at contra) := by rfl
+              have hb : lb = unwrap (FiniteTree.leaf lb) (by intro _ _ contra; simp at contra) := by rfl
               rw [ha, hb]
               simp [contra]
             contradiction
           )
-        | .inner _ _ => isFalse (by intro contra; exact FiniteTree.noConfusion contra)
+        | .inner _ _ => isFalse (by intro contra; simp at contra)
       | .inner la ca => match b with
-        | .leaf lb => isFalse (by intro contra; exact FiniteTree.noConfusion contra)
+        | .leaf lb => isFalse (by intro contra; simp at contra)
         | .inner lb cb => if eq_ls : la = lb
           then match finiteTreeListEq ca cb with
             | .isTrue p => isTrue (by simp [eq_ls, p])
@@ -46,8 +46,8 @@ mutual
               | FiniteTree.inner _ b => b
             intro contra
             have : ca = cb := by
-              have ha : ca = unwrap (FiniteTree.inner la ca) (by intro _ contra; exact FiniteTree.noConfusion contra) := by rfl
-              have hb : cb = unwrap (FiniteTree.inner lb cb) (by intro _ contra; exact FiniteTree.noConfusion contra) := by rfl
+              have ha : ca = unwrap (FiniteTree.inner la ca) (by intro _ contra; simp at contra) := by rfl
+              have hb : cb = unwrap (FiniteTree.inner lb cb) (by intro _ contra; simp at contra) := by rfl
               rw [ha, hb]
               simp [contra]
             contradiction
@@ -58,8 +58,8 @@ mutual
               | FiniteTree.inner a _ => a
             intro contra
             have : la = lb := by
-              have ha : la = unwrap (FiniteTree.inner la ca) (by intro _ contra; exact FiniteTree.noConfusion contra) := by rfl
-              have hb : lb = unwrap (FiniteTree.inner lb cb) (by intro _ contra; exact FiniteTree.noConfusion contra) := by rfl
+              have ha : la = unwrap (FiniteTree.inner la ca) (by intro _ contra; simp at contra) := by rfl
+              have hb : lb = unwrap (FiniteTree.inner lb cb) (by intro _ contra; simp at contra) := by rfl
               rw [ha, hb]
               simp [contra]
             contradiction
@@ -69,9 +69,9 @@ mutual
     match a with
       | .nil => match b with
         | .nil => isTrue (by rfl)
-        | .cons _ _ => isFalse (by intro contra; exact List.noConfusion contra)
+        | .cons _ _ => isFalse (by intro contra; simp at contra)
       | .cons ta la => match b with
-        | .nil => isFalse (by intro contra; exact List.noConfusion contra)
+        | .nil => isFalse (by intro contra; simp at contra)
         | .cons tb lb => match finiteTreeEq ta tb with
           | .isTrue tp => match finiteTreeListEq la lb with
             | .isTrue lp => isTrue (by simp [tp, lp])
@@ -81,8 +81,8 @@ mutual
                 | .cons _ b => b
               intro contra
               have : la = lb := by
-                have ha : la = unwrap (.cons ta la) (by intro contra; exact List.noConfusion contra) := by rfl
-                have hb : lb = unwrap (.cons tb lb) (by intro contra; exact List.noConfusion contra) := by rfl
+                have ha : la = unwrap (.cons ta la) (by intro contra; simp at contra) := by rfl
+                have hb : lb = unwrap (.cons tb lb) (by intro contra; simp at contra) := by rfl
                 rw [ha, hb]
                 simp [contra]
               contradiction
@@ -93,8 +93,8 @@ mutual
               | .cons a _ => a
             intro contra
             have : ta = tb := by
-              have ha : ta = unwrap (.cons ta la) (by intro contra; exact List.noConfusion contra) := by rfl
-              have hb : tb = unwrap (.cons tb lb) (by intro contra; exact List.noConfusion contra) := by rfl
+              have ha : ta = unwrap (.cons ta la) (by intro contra; simp at contra) := by rfl
+              have hb : tb = unwrap (.cons tb lb) (by intro contra; simp at contra) := by rfl
               rw [ha, hb]
               simp [contra]
             contradiction
