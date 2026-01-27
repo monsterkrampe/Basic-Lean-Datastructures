@@ -1,3 +1,8 @@
+/-!
+This file contains a helper function that generates all possible lists over a given list of candidates such that each of the lists has a given length.
+Since the definition would hardly be useful in proofs, the accompanying theorem states the desired properties ensured by the definition.
+-/
+
 def all_lists_of_length (candidates : List α) : Nat -> List (List α)
 | .zero => [[]]
 | .succ n =>
