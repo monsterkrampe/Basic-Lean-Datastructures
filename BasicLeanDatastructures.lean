@@ -1,4 +1,3 @@
-import BasicLeanDatastructures.Fin
 import BasicLeanDatastructures.FiniteTree
 import BasicLeanDatastructures.GetFreshInhabitant
 import BasicLeanDatastructures.List.AllListsOfLength
