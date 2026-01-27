@@ -1,5 +1,4 @@
 import BasicLeanDatastructures.Set.Basic
-import BasicLeanDatastructures.Option
 
 def List.decidableEqNil : (l : List α) -> Decidable (l = [])
 | .nil => .isTrue rfl
