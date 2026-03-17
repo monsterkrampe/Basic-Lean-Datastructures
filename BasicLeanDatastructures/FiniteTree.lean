@@ -1,3 +1,5 @@
+module
+
 import BasicLeanDatastructures.List.Basic
 
 /-!
@@ -7,6 +9,7 @@ This file defines finite trees as a nested inductive type `FiniteTree`.
 The tree can have different types for the contents of its leafs and inner nodes.
 -/
 
+public section
 
 /-- An `InductiveTree` is either a leaf or a node that features a list of children that are again trees. -/
 inductive FiniteTree (α : Type u) (β : Type v) where
@@ -31,84 +34,29 @@ mutual
     match a with
       | .leaf la => match b with
         | .leaf lb => if eq_ls : la = lb
-          then isTrue (by simp [eq_ls])
-          else isFalse (by
-            let unwrap := fun (x : FiniteTree α β) (hx : ∀ a b, x ≠ FiniteTree.inner a b) => match x with
-              | FiniteTree.leaf lx => lx
-              | FiniteTree.inner a b => absurd rfl (hx a b)
-            intro contra
-            have : la = lb := by
-              have ha : la = unwrap (FiniteTree.leaf la) (by intro _ _ contra; simp at contra) := by rfl
-              have hb : lb = unwrap (FiniteTree.leaf lb) (by intro _ _ contra; simp at contra) := by rfl
-              rw [ha, hb]
-              simp [contra]
-            contradiction
-          )
-        | .inner _ _ => isFalse (by intro contra; simp at contra)
+          then isTrue (by grind)
+          else isFalse (by grind)
+        | .inner _ _ => isFalse (by grind)
       | .inner la ca => match b with
-        | .leaf lb => isFalse (by intro contra; simp at contra)
+        | .leaf lb => isFalse (by grind)
         | .inner lb cb => if eq_ls : la = lb
           then match finiteTreeListEq ca cb with
-            | .isTrue p => isTrue (by simp [eq_ls, p])
-            | .isFalse np => isFalse (by
-            let unwrap := fun (x : FiniteTree α β) (hx : ∀ a, x ≠ FiniteTree.leaf a) => match x with
-              | FiniteTree.leaf a => absurd rfl (hx a)
-              | FiniteTree.inner _ b => b
-            intro contra
-            have : ca = cb := by
-              have ha : ca = unwrap (FiniteTree.inner la ca) (by intro _ contra; simp at contra) := by rfl
-              have hb : cb = unwrap (FiniteTree.inner lb cb) (by intro _ contra; simp at contra) := by rfl
-              rw [ha, hb]
-              simp [contra]
-            contradiction
-          )
-          else isFalse (by
-            let unwrap := fun (x : FiniteTree α β) (hx : ∀ a, x ≠ FiniteTree.leaf a) => match x with
-              | FiniteTree.leaf a => absurd rfl (hx a)
-              | FiniteTree.inner a _ => a
-            intro contra
-            have : la = lb := by
-              have ha : la = unwrap (FiniteTree.inner la ca) (by intro _ contra; simp at contra) := by rfl
-              have hb : lb = unwrap (FiniteTree.inner lb cb) (by intro _ contra; simp at contra) := by rfl
-              rw [ha, hb]
-              simp [contra]
-            contradiction
-          )
+            | .isTrue p => isTrue (by grind)
+            | .isFalse np => isFalse (by grind)
+          else isFalse (by grind)
 
   def finiteTreeListEq [DecidableEq α] [DecidableEq β] (a b : List (FiniteTree α β)) : Decidable (a = b) :=
     match a with
       | .nil => match b with
         | .nil => isTrue (by rfl)
-        | .cons _ _ => isFalse (by intro contra; simp at contra)
+        | .cons _ _ => isFalse (by grind)
       | .cons ta la => match b with
-        | .nil => isFalse (by intro contra; simp at contra)
+        | .nil => isFalse (by grind)
         | .cons tb lb => match finiteTreeEq ta tb with
           | .isTrue tp => match finiteTreeListEq la lb with
-            | .isTrue lp => isTrue (by simp [tp, lp])
-            | .isFalse lnp => isFalse (by
-              let unwrap := fun (x : List (FiniteTree α β)) (hx : x ≠ []) => match x with
-                | .nil => absurd rfl hx
-                | .cons _ b => b
-              intro contra
-              have : la = lb := by
-                have ha : la = unwrap (.cons ta la) (by intro contra; simp at contra) := by rfl
-                have hb : lb = unwrap (.cons tb lb) (by intro contra; simp at contra) := by rfl
-                rw [ha, hb]
-                simp [contra]
-              contradiction
-            )
-          | .isFalse tnp => isFalse (by
-            let unwrap := fun (x : List (FiniteTree α β)) (hx : x ≠ []) => match x with
-              | .nil => absurd rfl hx
-              | .cons a _ => a
-            intro contra
-            have : ta = tb := by
-              have ha : ta = unwrap (.cons ta la) (by intro contra; simp at contra) := by rfl
-              have hb : tb = unwrap (.cons tb lb) (by intro contra; simp at contra) := by rfl
-              rw [ha, hb]
-              simp [contra]
-            contradiction
-          )
+            | .isTrue lp => isTrue (by grind)
+            | .isFalse lnp => isFalse (by grind)
+          | .isFalse tnp => isFalse (by grind)
 end
 
 instance [DecidableEq α] [DecidableEq β] (a b : FiniteTree α β) : Decidable (a = b) := finiteTreeEq a b
@@ -150,19 +98,17 @@ namespace FiniteTree
         intro t t_mem
         apply ih
         . exact t_mem
-        . rw [List.map_flatMap, List.map_flatMap] at h
-          unfold List.flatMap at h
-          have : ts.map (fun t => t.leaves.map f) = ts.map (fun t => t.leaves.map g) := by
+        . have : ts.map (fun t => t.leaves.map f) = ts.map (fun t => t.leaves.map g) := by
+            rw [List.map_flatMap, List.map_flatMap] at h
+            unfold List.flatMap at h
             apply List.eq_iff_flatten_eq.mpr
             constructor
             . exact h
             . rw [List.map_map, List.map_map]
               apply List.map_congr_left
-              intro t t_mem
-              simp only [Function.comp_apply, List.length_map]
+              simp
           rw [List.map_inj_left] at this
-          apply this
-          exact t_mem
+          exact this _ t_mem
 
   /-- Returns the root label of a given tree. This only works if the types for leaf and inner nodes are the same. -/
   def nodeLabel : FiniteTree α α -> α
@@ -186,16 +132,7 @@ namespace FiniteTree
 
   /-- A tree cannot occur as its own child. -/
   theorem tree_eq_while_contained_is_impossible [DecidableEq α] [DecidableEq β]
-      (t : FiniteTree α β) (ts : List (FiniteTree α β)) (a : α) (h_eq : FiniteTree.inner a ts = t) (h_contains : t ∈ ts) : False := by
-    induction t with
-    | leaf _ => contradiction
-    | inner label children ih =>
-      apply ih (.inner label children)
-      . injection h_eq with _ children_eq
-        rw [children_eq] at h_contains
-        exact h_contains
-      . exact h_eq
-      . exact h_contains
+      (t : FiniteTree α β) (ts : List (FiniteTree α β)) (a : α) (h_eq : FiniteTree.inner a ts = t) (h_contains : t ∈ ts) : False := by induction t <;> grind
 
 end FiniteTree
 
