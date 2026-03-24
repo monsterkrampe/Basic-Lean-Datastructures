@@ -65,21 +65,25 @@ instance [DecidableEq α] [DecidableEq β] (a b : FiniteTree α β) : Decidable 
 namespace FiniteTree
 
   /-- Returns the `depth` of the tree where a leaf is defined to have depth 1. -/
+  @[expose]
   def depth : FiniteTree α β -> Nat
   | FiniteTree.leaf _ => 1
   | FiniteTree.inner _ ts => 1 + (ts.map depth).max?.getD 1
 
   /-- Returns all leaf nodes of the tree as a single list. (Intuitively you simply read all leaves from left to right). -/
+  @[expose]
   def leaves : FiniteTree α β -> List β
   | FiniteTree.leaf b => List.cons b List.nil
   | FiniteTree.inner _ ts => ts.flatMap leaves
 
   /-- Returns all nodes that are not leaves as a single list. You can imagine going branch by branch from left to right while avoiding using the same node twice. -/
+  @[expose]
   def innerLabels : FiniteTree α β -> List α
   | .leaf _ => []
   | .inner a ts => a :: ts.flatMap innerLabels
 
   /-- Returns the tree there we leaf nodes have been replaced according to the function `f`. -/
+  @[expose]
   def mapLeaves (f : β -> FiniteTree α γ) : FiniteTree α β -> FiniteTree α γ
   | FiniteTree.leaf b => f b
   | FiniteTree.inner a ts => FiniteTree.inner a (ts.map (mapLeaves f))
@@ -111,28 +115,15 @@ namespace FiniteTree
           exact this _ t_mem
 
   /-- Returns the root label of a given tree. This only works if the types for leaf and inner nodes are the same. -/
+  @[expose]
   def nodeLabel : FiniteTree α α -> α
   | FiniteTree.leaf a => a
   | FiniteTree.inner a _ => a
 
-  /-- Check that `f` holds for each subtree of a given tree. -/
-  def forEach (f : (FiniteTree α β) -> Prop) : FiniteTree α β -> Prop
-  | FiniteTree.leaf c => f (.leaf c)
-  | FiniteTree.inner a ts => (f (.inner a ts)) ∧ (∀ t ∈ ts, f t)
-
-  private def privateTreesInDepth (t : FiniteTree α β) (depth : Nat) (currentDepth : Nat) : List (FiniteTree α β) :=
-    if (currentDepth > depth) then [] else
-      if (currentDepth = depth) then [t] else
-        match t with
-        | FiniteTree.leaf _ => [t]
-        | FiniteTree.inner _ ts => ts.flatMap (fun t => t.privateTreesInDepth depth (currentDepth + 1))
-
-  /-- For a given depth, returns all subtrees of the given tree `t` that have their root at this depth in `t`. -/
-  def treesInDepth (t : FiniteTree α β) (depth : Nat) : List (FiniteTree α β) := t.privateTreesInDepth depth 0
-
   /-- A tree cannot occur as its own child. -/
   theorem tree_eq_while_contained_is_impossible [DecidableEq α] [DecidableEq β]
-      (t : FiniteTree α β) (ts : List (FiniteTree α β)) (a : α) (h_eq : FiniteTree.inner a ts = t) (h_contains : t ∈ ts) : False := by induction t <;> grind
+      (t : FiniteTree α β) (ts : List (FiniteTree α β)) (a : α) (h_eq : FiniteTree.inner a ts = t) (h_contains : t ∈ ts) : False := by
+    induction t <;> grind
 
 end FiniteTree
 
