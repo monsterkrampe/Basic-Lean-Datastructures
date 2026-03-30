@@ -33,6 +33,10 @@ def eraseDupsKeepRight [DecidableEq α] : List α -> List α
 theorem mem_eraseDupsKeepRight [DecidableEq α] (l : List α) : ∀ e, e ∈ l.eraseDupsKeepRight ↔ e ∈ l := by
   fun_induction eraseDupsKeepRight <;> grind
 
+/-- eraseDupsKeepRight can only make the list shorter. -/
+theorem length_eraseDupsKeepRight_le [DecidableEq α] (l : List α) : l.eraseDupsKeepRight.length ≤ l.length := by
+  fun_induction eraseDupsKeepRight <;> grind
+
 /-- The deduplicated list indeed has no duplicates. -/
 @[grind <-]
 theorem nodup_eraseDupsKeepRight [DecidableEq α] (l : List α) : l.eraseDupsKeepRight.Nodup := by
@@ -42,6 +46,10 @@ theorem nodup_eraseDupsKeepRight [DecidableEq α] (l : List α) : l.eraseDupsKee
 @[simp, grind =]
 theorem eraseDupsKeepRight_eq_self_of_nodup [DecidableEq α] (l : List α) (nodup : l.Nodup) : l.eraseDupsKeepRight = l := by
   fun_induction eraseDupsKeepRight <;> grind
+
+/-- If the length after erasing duplicates remains the same, then the list contains no duplicates. -/
+theorem nodup_of_length_eraseDupsKeepRight_same [DecidableEq α] (l : List α) (length_eq : l.eraseDupsKeepRight.length = l.length) : l.Nodup := by
+  fun_induction eraseDupsKeepRight <;> grind [length_eraseDupsKeepRight_le]
 
 /-- Calling `eraseDupsKeepRight` a second time does not change anything anymore. -/
 @[simp, grind =]
