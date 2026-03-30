@@ -22,6 +22,7 @@ theorem List.length_eq_of_nodup_of_same_elements [DecidableEq α] (l1 l2 : List 
 public section
 
 namespace List
+
 /-- Remove duplicates from a list, keeping the rightmost occurrense. -/
 def eraseDupsKeepRight [DecidableEq α] : List α -> List α
 | [] => []
@@ -37,10 +38,14 @@ theorem mem_eraseDupsKeepRight [DecidableEq α] (l : List α) : ∀ e, e ∈ l.e
 theorem nodup_eraseDupsKeepRight [DecidableEq α] (l : List α) : l.eraseDupsKeepRight.Nodup := by
   fun_induction eraseDupsKeepRight <;> grind
 
+/-- Erasing dups from a list without duplicates does not change anything. -/
+@[simp, grind =]
+theorem eraseDupsKeepRight_eq_self_of_nodup [DecidableEq α] (l : List α) (nodup : l.Nodup) : l.eraseDupsKeepRight = l := by
+  fun_induction eraseDupsKeepRight <;> grind
+
 /-- Calling `eraseDupsKeepRight` a second time does not change anything anymore. -/
 @[simp, grind =]
-theorem eraseDupsKeepRight_idempotent [DecidableEq α] (l : List α) : l.eraseDupsKeepRight.eraseDupsKeepRight = l.eraseDupsKeepRight := by
-  fun_induction eraseDupsKeepRight <;> grind [eraseDupsKeepRight]
+theorem eraseDupsKeepRight_idempotent [DecidableEq α] (l : List α) : l.eraseDupsKeepRight.eraseDupsKeepRight = l.eraseDupsKeepRight := by grind
 
 /-- If two lists contain the same elements, then calling `eraseDupsKeepRight` on both ends up with lists of equal length. Again the lists might not be equal as they could differ in their order of elements. -/
 theorem length_eraseDupsKeepRight_eq_of_same_elements [DecidableEq α] (l1 l2 : List α) :
