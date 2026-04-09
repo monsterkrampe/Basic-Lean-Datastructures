@@ -56,6 +56,9 @@ theorem not_empty_contains_element (X : Set α) : X ≠ ∅ -> ∃ e, e ∈ X :=
 @[grind ->]
 theorem mem_of_subset_of_mem {e : α} {A B : Set α} : A ⊆ B -> e ∈ A -> e ∈ B := by intro sub mem; exact sub _ mem
 
+/-- Unfolds the definition of set union. -/
+theorem mem_union_iff {e : α} {A B : Set α} : e ∈ A ∪ B ↔ e ∈ A ∨ e ∈ B := by rfl
+
 /-- If e is in A, then e is in A ∪ B. -/
 @[grind <-]
 theorem mem_union_of_mem_left {e : α} {A B : Set α} : e ∈ A -> e ∈ A ∪ B := by intro mem; apply Or.inl; exact mem
