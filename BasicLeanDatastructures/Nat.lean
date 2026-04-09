@@ -1,3 +1,8 @@
+/-
+Copyright 2026 Lukas Gerlach
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+
 module
 
 /-- if a there is a natural number such that a certain property holds, then there is a smallest such number. -/
