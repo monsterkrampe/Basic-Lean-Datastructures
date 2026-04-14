@@ -5,7 +5,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 module
 
-/-- if a there is a natural number such that a certain property holds, then there is a smallest such number. -/
+/-!
+This file contains convenience theorems around natural numbers.
+Right now, it only features `prop_for_nat_has_minimal_such_nat`.
+-/
+
+/-- If a there is a natural number such that a certain property holds, then there is a smallest such number. -/
 public theorem prop_for_nat_has_minimal_such_nat (prop : Nat -> Prop) : ∀ i, prop i -> (∃ i, prop i ∧ ∀ (j : Fin i), ¬ prop j.val) := by
   intro i h
   -- TODO: can we do this without classical? at least going through all j < i should be possible; only prop might not be decidable

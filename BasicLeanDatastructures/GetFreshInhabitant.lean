@@ -15,7 +15,7 @@ of type `t` that does itself not occur in `l`.
 This captures the intuition that certain types always allow picking "fresh" representants.
 For example, one would assume that it is always possibly to pick a fresh natural numbers if only finitely many numbers have been used so far.
 
-To give an example, we also implement this typeclass for the natural numbers at the end of the file.
+In the source code of this file, you can find an example implementation of this typeclass for the natural numbers.
 -/
 
 
@@ -38,8 +38,6 @@ public def fresh_n {t : Type u} [GetFreshInhabitant t] (l : List t) (n : Nat) :
 end GetFreshInhabitant
 
 namespace Nat
-
-/-! We give an example implementation for the natural numbers. -/
 
 /-- For a list of natural numbers, we can pick a fresh element by taking the successor of the maximal number from the list. -/
 def fresh (l : List Nat) : { n : Nat // n ∉ l} :=
