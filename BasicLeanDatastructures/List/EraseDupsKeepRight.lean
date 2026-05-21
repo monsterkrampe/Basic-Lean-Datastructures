@@ -5,6 +5,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 module
 
+import BasicLeanDatastructures.List.Nodup
+
 /-!
 # eraseDupsKeepRight
 
@@ -13,16 +15,6 @@ This function assumes `DecidableEq` on the list elements.
 As one would expect, the resulting list is free of duplicates and still contains the same members as the original list, which
 is shown in theorems below.
 -/
-
-/-- If two lists have no duplicates and have the same elements, then their length is the same. Note that the lists are not necessarily equal since the order of elements may differ. -/
-theorem List.length_eq_of_nodup_of_same_elements [DecidableEq α] (l1 l2 : List α) (nodup1 : l1.Nodup) (nodup2 : l2.Nodup) (same_elems : ∀ e, e ∈ l1 ↔ e ∈ l2) : l1.length = l2.length := by
-  induction l1 generalizing l2 with
-  | nil =>
-    have : l2 = [] := by rw [List.eq_nil_iff_forall_not_mem]; grind
-    rw [this]
-  | cons hd tl ih =>
-    have : l2.length = (l2.erase hd).length + 1 := by grind
-    grind
 
 public section
 
