@@ -56,9 +56,9 @@ theorem length_imageList [DecidableEq β]
     {f : α -> β} {domain : List α} : (imageList f domain).length ≤ domain.length := by
   suffices domain.length = (domain.map f).length by
     rw [this]
-    apply List.length_le_of_nodup_of_all_mem
+    apply List.length_le_of_nodup_of_subset
     . apply nodup_imageList
-    . simp [imageList, List.mem_eraseDupsKeepRight]
+    . intro _; simp [imageList, List.mem_eraseDupsKeepRight]
   rw [List.length_map]
 
 end ImageList

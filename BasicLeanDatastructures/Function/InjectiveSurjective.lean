@@ -224,7 +224,7 @@ theorem injective_of_surjective_of_nodup [DecidableEq α] {f : α -> α} {l : Li
   rw [Nat.eq_iff_le_and_ge]
   constructor
   . exact length_imageList
-  . exact List.length_le_of_nodup_of_all_mem l (imageList f l) nodup surj
+  . exact List.length_le_of_nodup_of_subset l (imageList f l) nodup surj
 
 /-- Given a single list without duplicates that represents both domain and image, if a mapping closed on the list, then the mapping is injective if and only if it is surjective. -/
 theorem injective_iff_surjective_of_nodup_of_closed [DecidableEq α] {f : α -> α} {l : List α}
@@ -235,7 +235,7 @@ theorem injective_iff_surjective_of_nodup_of_closed [DecidableEq α] {f : α -> 
       rw [surjective_on_target_iff_all_in_imageList]
       intro b
       apply (this b).mpr
-    apply List.equiv_of_nodup_of_length_eq_of_all_mem
+    apply List.equiv_of_nodup_of_length_eq_of_subset
     . exact nodup_imageList
     . rw [injectiveList_iff_length_imageList_eq_of_nodup] at inj
       rw [inj]
@@ -251,7 +251,7 @@ theorem closed_of_injective_of_surjective_of_nodup [DecidableEq α] {f : α -> �
     f.injectiveList l -> f.surjectiveList l l -> f.closedList l := by
   intro inj surj
   intro e e_mem
-  rw [List.equiv_of_nodup_of_length_eq_of_all_mem l (imageList f l) nodup]
+  rw [List.equiv_of_nodup_of_length_eq_of_subset l (imageList f l) nodup]
   . apply mapping_mem_imageList_of_mem; exact e_mem
   . rw [(injectiveList_iff_length_imageList_eq_of_nodup nodup).mp inj]
   . exact surjective_on_target_iff_all_in_imageList.mp surj
