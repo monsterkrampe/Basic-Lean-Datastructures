@@ -26,6 +26,12 @@ def repeat_fun (f : α -> α) : Nat -> α -> α
 | .zero => id
 | .succ j => f ∘ (repeat_fun f j)
 
+/-- Applying a zero-times repetition yields the original value. -/
+theorem repeat_zero {f : α -> α} : ∀ {e}, f.repeat_fun 0 e = e := by simp [repeat_fun]
+
+/-- Applying a n+1-times repetition means applying the function to the result of the n-times repetition. -/
+theorem repeat_succ {f : α -> α} {i : Nat} : ∀ {e}, f.repeat_fun i.succ e = f (f.repeat_fun i e) := by simp [repeat_fun]
+
 /-- Repeating a function once yields exactly the function. -/
 @[simp, grind =]
 theorem repeat_once {f : α -> α} : f.repeat_fun 1 = f := by simp [repeat_fun]
