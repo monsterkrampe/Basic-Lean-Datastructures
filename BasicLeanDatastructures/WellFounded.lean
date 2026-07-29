@@ -25,3 +25,19 @@ public theorem minimal_element_for_property_and_relation
       simp only [not_exists, not_and] at nex
       exists a
 
+/-- If a there is an element such that a certain property holds, then there is a smallest such element that is a predecessor of the original element. -/
+public theorem minimal_element_for_property_and_transitive_relation
+    {α : Type u} [rel : WellFoundedRelation α] (trans : ∀ a b c, rel.rel a b -> rel.rel b c -> rel.rel a c) (prop : α -> Prop) (a : α) (ha : prop a) :
+    (∃ c, prop c ∧ (c = a ∨ rel.rel c a) ∧ ∀ b, rel.rel b c -> ¬ prop b) := by
+  induction a using WellFounded.induction rel.wf with
+  | h a ih =>
+    cases Classical.em (∃ b, rel.rel b a ∧ prop b) with
+    | inl ex =>
+      rcases ex with ⟨b, rel_b, hb⟩
+      rcases ih b rel_b hb with ⟨c, hc, rel_c, nex⟩
+      suffices rel.rel c a by exists c; grind
+      cases rel_c <;> grind
+    | inr nex =>
+      simp only [not_exists, not_and] at nex
+      exists a; grind
+
