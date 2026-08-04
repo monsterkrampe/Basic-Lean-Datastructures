@@ -59,40 +59,6 @@ theorem sum_take_le_sum (l : List Nat) (i : Fin (l.length + 1)) : (l.take i.val)
       apply Nat.add_le_add_left
       apply ih ⟨i.val, i.isLt⟩
 
-/-- This function is essentially `List.zipIdx` but the indices are associated with a proof that they are indeed smaller than the length of the list, represented as `Fin`. -/
-def zipIdx_with_lt (l : List α) : List (α × (Fin l.length)) :=
-  l.zipIdx.attach.map (fun ⟨pair, h⟩ => (pair.fst, ⟨pair.snd, List.snd_lt_of_mem_zipIdx h⟩))
-
-/-- The length of `zipIdx_with_lt` is the original length. -/
-@[simp, grind =]
-theorem length_zipIdx_with_lt (l : List α) : l.zipIdx_with_lt.length = l.length := by simp [zipIdx_with_lt]
-
-/-- The first part of a pair at a given index in `zipIdx_with_lt` corresponds to the list element at the same index. -/
-@[simp, grind =]
-theorem zipIdx_with_lt_getElem_fst_eq_getElem {l : List α} {index : Nat} (h : index < l.length) : (l.zipIdx_with_lt[index]'(by rw [length_zipIdx_with_lt]; exact h)).fst = l[index] := by simp [zipIdx_with_lt]
-
-/-- The second part of a pair at a given index in `zipIdx_with_lt` is exactly this index (represented as `Fin`). -/
-@[simp, grind =]
-theorem zipIdx_with_lt_getElem_snd_eq_index {l : List α} {index : Nat} (h : index < l.length) : (l.zipIdx_with_lt[index]'(by rw [length_zipIdx_with_lt]; exact h)).snd = ⟨index, h⟩ := by simp [zipIdx_with_lt]
-
-/-- Membership in `zipIdx_with_lt` is equivalent to membership in `List.zipIdx`. -/
-@[simp, grind =]
-theorem mem_zipIdx_with_lt_iff_mem_zipIdx {l : List α} : ∀ (i : Fin l.length) (el : α), (el, i) ∈ l.zipIdx_with_lt ↔ (el, i.val) ∈ l.zipIdx := by
-  intro i el
-  unfold zipIdx_with_lt
-  simp
-  constructor
-  . intro h
-    cases h with | intro ival h =>
-      cases h with | intro h eq =>
-        rw [← eq]
-        exact h
-  . intro h; exists i.val; exists h
-
-/-- A pair of an element `el` and an index `i` is in `zipIdx_with_lt` if and only if `el` is at index `i` in the underlying list. -/
-theorem mk_mem_zipIdx_with_lt_iff_getElem {l : List α} : ∀ (i : Fin l.length) (el : α), (el, i) ∈ l.zipIdx_with_lt ↔ l[i.val] = el := by
-  simp [List.mk_mem_zipIdx_iff_getElem?]
-
 /-- Converts any with a negated predicate into a negated call to all with a positive predicate. -/
 theorem neg_all_of_any_neg (l : List α) (p : α -> Bool) : l.any (fun a => ¬p a) -> ¬l.all p := by simp
 
