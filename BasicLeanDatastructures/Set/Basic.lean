@@ -11,7 +11,7 @@ module
 This file introduces a very basic `Set` type, which is merely a function from the element type into `Prop`.
 -/
 
-@[expose]
+@[expose, implicit_reducible]
 public def Set (α : Type u) := α -> Prop
 
 public section
