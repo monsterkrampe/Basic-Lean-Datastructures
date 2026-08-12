@@ -21,10 +21,12 @@ inductive FiniteTree (α : Type u) (β : Type v) where
 | leaf : β -> FiniteTree α β
 | inner : α -> List (FiniteTree α β) -> FiniteTree α β
 
+variable {α : Type u} {β : Type v}
+
 /-- A simplified recursor for proving properties of finite trees via induction. (The default recursor generated for the nested inductive type was not very useful for me.) -/
 @[elab_as_elim, induction_eliminator]
 def FiniteTree.rec'
-    {motive : FiniteTree α β -> Sort u}
+    {motive : FiniteTree α β -> Sort w}
     (leaf : (l : β) -> motive (FiniteTree.leaf l))
     (inner : (label : α) -> (ts : List (FiniteTree α β)) -> (∀ t, t ∈ ts -> motive t) -> motive (FiniteTree.inner label ts))
     (t : FiniteTree α β) :
@@ -89,14 +91,20 @@ def innerLabels : FiniteTree α β -> List α
 | .leaf _ => []
 | .inner a ts => a :: ts.flatMap innerLabels
 
+/-- Returns all subtrees, i.e. the tree itself and all subtrees of its immediate children. -/
+@[expose]
+def subtrees : FiniteTree α β -> List (FiniteTree α β)
+| .leaf c => [.leaf c]
+| .inner a ts => .inner a ts :: ts.flatMap subtrees
+
 /-- Returns the tree there we leaf nodes have been replaced according to the function `f`. -/
 @[expose]
-def mapLeaves (f : β -> FiniteTree α γ) : FiniteTree α β -> FiniteTree α γ
+def mapLeaves {γ : Type v'} (f : β -> FiniteTree α γ) : FiniteTree α β -> FiniteTree α γ
 | FiniteTree.leaf b => f b
 | FiniteTree.inner a ts => FiniteTree.inner a (ts.map (mapLeaves f))
 
 /-- The trees resulting from two different leaf mappings are the same of applying the functions only on the list of leaves yields the same list. -/
-theorem mapLeaves_eq_of_map_leaves_eq {f : β -> FiniteTree α γ} {g : β -> FiniteTree α γ} {t : FiniteTree α β} : t.leaves.map f = t.leaves.map g -> t.mapLeaves f = t.mapLeaves g := by
+theorem mapLeaves_eq_of_map_leaves_eq {γ : Type v'} {f : β -> FiniteTree α γ} {g : β -> FiniteTree α γ} {t : FiniteTree α β} : t.leaves.map f = t.leaves.map g -> t.mapLeaves f = t.mapLeaves g := by
   induction t with
   | leaf _ => simp [leaves, mapLeaves]
   | inner label ts ih =>
