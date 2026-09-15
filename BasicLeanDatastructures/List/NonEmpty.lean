@@ -11,6 +11,8 @@ module
 Here, we define non-empty lists based on regular lists.
 -/
 
+public section
+
 /-- Basically a `NonEmptyList` is a `List` without the nil constructor. -/
 inductive NonEmptyList (α : Type u) where
 | cons (hd : α) (tl : List α) : NonEmptyList α
@@ -20,6 +22,7 @@ namespace NonEmptyList
 variable {α : Type u}
 
 /-- We can convert a `NonEmptyList` to a regular `List` in the obvious way. -/
+@[expose]
 def toList : NonEmptyList α -> List α
 | .cons hd tl => .cons hd tl
 
@@ -27,15 +30,17 @@ def toList : NonEmptyList α -> List α
 theorem toList_ne_nil {l : NonEmptyList α} : l.toList ≠ [] := by simp [toList]
 
 /-- We can build a `NonEmptyList` from a regular `List` as long as we know that the list is not empty. -/
+@[expose]
 def from_ne_nil (l : List α) (ne_nil : l ≠ []) : NonEmptyList α := match l with
 | .nil => False.elim (ne_nil rfl)
 | .cons a as => .cons a as
 
 /-- Construct a `NonEmptyList` from a single element. -/
-@[match_pattern]
+@[expose, match_pattern]
 def singleton (a : α) : NonEmptyList α := .cons a []
 
 /-- Construct a `NonEmptyList` from a single element and a `NonEmptyList`. -/
+@[expose]
 def cons' (a : α) (as : NonEmptyList α) : NonEmptyList α := .cons a as.toList
 
 /-- Alternative cases eliminator. -/
