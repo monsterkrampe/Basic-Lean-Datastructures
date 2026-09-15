@@ -65,5 +65,21 @@ def rec'
   | .singleton a => singleton a
   | .cons a (a' :: as) => cons' a (.cons a' as) (rec' (.cons a' as) singleton cons')
 
+/-- Extract first element from `NonEmptyList`. -/
+@[expose]
+def head : NonEmptyList α -> α
+| .cons a _ => a
+
+/-- We can express `head` in terms of the regular list obtained through `toList`. -/
+theorem head_eq {l : NonEmptyList α} : l.head = l.toList.head l.toList_ne_nil := by simp [head, toList]
+
+/-- Extract all but the first element from `NonEmptyList`. This returns a plain `List`. -/
+@[expose]
+def tail : NonEmptyList α -> List α
+| .cons _ as => as
+
+/-- We can express `tail` in terms of the regular list obtained through `toList`. -/
+theorem tail_eq {l : NonEmptyList α} : l.tail = l.toList.tail := by simp [tail, toList]
+
 end NonEmptyList
 
