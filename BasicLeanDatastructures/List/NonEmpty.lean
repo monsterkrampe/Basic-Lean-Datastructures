@@ -39,9 +39,17 @@ def from_ne_nil (l : List α) (ne_nil : l ≠ []) : NonEmptyList α := match l w
 @[expose, match_pattern]
 def singleton (a : α) : NonEmptyList α := .cons a []
 
+/-- Transforming a singleton into a list yields a singleton list. -/
+@[simp, grind =]
+theorem toList_singleton {a : α} : (singleton a).toList = [a] := by simp [toList]
+
 /-- Construct a `NonEmptyList` from a single element and a `NonEmptyList`. -/
 @[expose]
 def cons' (a : α) (as : NonEmptyList α) : NonEmptyList α := .cons a as.toList
+
+/-- Transforming a cons' into a list yields the expected list. -/
+@[simp, grind =]
+theorem toList_cons' {a : α} {as : NonEmptyList α} : (cons' a as).toList = a :: as.toList := by simp [cons', toList]
 
 /-- Alternative cases eliminator. -/
 @[elab_as_elim]
