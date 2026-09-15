@@ -14,6 +14,7 @@ import BasicLeanDatastructures.List.AllListsOfLength
 import BasicLeanDatastructures.List.Basic
 import BasicLeanDatastructures.List.EraseDupsKeepRight
 import BasicLeanDatastructures.List.Nodup
+import BasicLeanDatastructures.List.NonEmpty
 import BasicLeanDatastructures.Set.Basic
 import BasicLeanDatastructures.Set.Finite
 import BasicLeanDatastructures.WellFounded
