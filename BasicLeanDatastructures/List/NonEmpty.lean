@@ -81,6 +81,14 @@ def head : NonEmptyList α -> α
 /-- We can express `head` in terms of the regular list obtained through `toList`. -/
 theorem head_eq {l : NonEmptyList α} : l.head = l.toList.head l.toList_ne_nil := by simp [head, toList]
 
+/-- The `head` of a `singleton` is the single value. -/
+@[simp, grind =]
+theorem head_singleton {a : α} : (singleton a).head = a := by simp [head]
+
+/-- The `head` of a `cons'` is the first value. -/
+@[simp, grind =]
+theorem head_cons' {a : α} {as : NonEmptyList α} : (cons' a as).head = a := by simp [cons', head]
+
 /-- Extract all but the first element from `NonEmptyList`. This returns a plain `List`. -/
 @[expose]
 def tail : NonEmptyList α -> List α
@@ -88,6 +96,14 @@ def tail : NonEmptyList α -> List α
 
 /-- We can express `tail` in terms of the regular list obtained through `toList`. -/
 theorem tail_eq {l : NonEmptyList α} : l.tail = l.toList.tail := by simp [tail, toList]
+
+/-- The `tail` of a `singleton` is empty. -/
+@[simp, grind =]
+theorem tail_singleton {a : α} : (singleton a).tail = [] := by simp [tail]
+
+/-- The `tail` of a `cons'` is everything but the first value. -/
+@[simp, grind =]
+theorem tail_cons' {a : α} {as : NonEmptyList α} : (cons' a as).tail = as.toList := by simp [cons', tail]
 
 end NonEmptyList
 
