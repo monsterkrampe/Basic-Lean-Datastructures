@@ -9,6 +9,9 @@ public import BasicLeanDatastructures.List.EraseDupsKeepRight
 import BasicLeanDatastructures.List.Nodup
 public import BasicLeanDatastructures.Set.Basic
 
+namespace CustomBasicDatastructures
+open CustomBasicDatastructures
+
 /-!
 # Function Images
 

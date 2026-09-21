@@ -7,6 +7,9 @@ module
 
 public import BasicLeanDatastructures.Set.Basic
 
+namespace CustomBasicDatastructures
+open CustomBasicDatastructures
+
 /-!
 This file contains a collection definitions and theorems about lists that are not part of Lean's standard library.
 At least when initially writing some of these, suitable variants did not exist or I simply did not find them.

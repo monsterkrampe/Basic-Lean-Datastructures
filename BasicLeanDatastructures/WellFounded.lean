@@ -5,6 +5,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 module
 
+namespace CustomBasicDatastructures
+
 /-!
 This file contains convenience theorems around `WellFoundedRelation`s.
 Right now, it only features `minimal_elem_for_prop_exists` that returns the minimal element

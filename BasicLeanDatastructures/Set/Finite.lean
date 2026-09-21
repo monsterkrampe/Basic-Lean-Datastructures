@@ -8,6 +8,9 @@ module
 public import BasicLeanDatastructures.List.Basic
 import BasicLeanDatastructures.List.EraseDupsKeepRight
 
+namespace CustomBasicDatastructures
+open CustomBasicDatastructures
+
 /-!
 # Set.finite
 

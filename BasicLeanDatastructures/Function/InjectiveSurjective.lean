@@ -9,6 +9,9 @@ import BasicLeanDatastructures.List.Basic
 import BasicLeanDatastructures.List.Nodup
 public import BasicLeanDatastructures.Function.Image
 
+namespace CustomBasicDatastructures
+open CustomBasicDatastructures
+
 /-!
 # Flexible Injectivity and Surjectivity
 
@@ -42,13 +45,13 @@ def closedSet (f : α -> α) (domain : Set α) : Prop := ∀ a ∈ domain, f a �
 
 /-- If a mapping is injective for a domain, then the same holds for any subset of the domain. -/
 theorem injectiveSet_of_injectiveSet_of_subset {f : α -> β} {domain : Set α} :
-    f.injectiveSet domain -> ∀ domain', domain' ⊆ domain -> f.injectiveSet domain' := by
+    injectiveSet f domain -> ∀ domain', domain' ⊆ domain -> injectiveSet f domain' := by
   intro inj dom' dom'_sub a a' a_mem a'_mem
   apply inj <;> (apply dom'_sub; assumption)
 
 /-- If a mapping is surjective for a domain and image, then the same holds for any superset of the domain. -/
 theorem surjectiveSet_of_surjectiveSet_of_superset {f : α -> β} {domain : Set α} {image : Set β} :
-    f.surjectiveSet domain image -> ∀ domain', domain ⊆ domain' -> f.surjectiveSet domain' image := by
+    surjectiveSet f domain image -> ∀ domain', domain ⊆ domain' -> surjectiveSet f domain' image := by
   intro surj dom' dom'_sub b b_mem
   rcases surj b b_mem with ⟨a, a_mem, a_eq⟩
   exists a
@@ -65,7 +68,7 @@ theorem injectiveSet_of_injectiveSet_compose {f : α -> β} {g : β -> γ} {doma
 
 /-- If the composition of two mappings is surjective for a domain and image, then the second one must be surjective on the same image and the domain that is the image of the first function. -/
 theorem surjectiveSet_of_surjectiveSet_compose {f : α -> β} {g : β -> γ} {domain : Set α} {image : Set γ} :
-    surjectiveSet (g ∘ f) domain image -> surjectiveSet g (f.imageSet domain) image := by
+    surjectiveSet (g ∘ f) domain image -> surjectiveSet g (imageSet f domain) image := by
   intro surj b b_mem
   rcases surj b b_mem with ⟨a, a_mem, a_eq⟩
   exists f a
@@ -74,12 +77,12 @@ theorem surjectiveSet_of_surjectiveSet_compose {f : α -> β} {g : β -> γ} {do
   . exact a_eq
 
 /-- Every mapping is always surjective on its own `imageSet`. -/
-theorem surjective_on_own_imageSet (f : α -> β) (domain : Set α) : f.surjectiveSet domain (imageSet f domain) := by
+theorem surjective_on_own_imageSet (f : α -> β) (domain : Set α) : surjectiveSet f domain (imageSet f domain) := by
   intro b b_mem; simp only [imageSet, Set.mem_map] at b_mem; exact b_mem
 
 /-- If a mapping is closed, then its image is fully contained in its domain. -/
 theorem imageSet_contained_of_closed
-    {f : α -> α} {domain : Set α} (closed : f.closedSet domain) :
+    {f : α -> α} {domain : Set α} (closed : closedSet f domain) :
     imageSet f domain ⊆ domain := by
   intro b b_mem
   rcases surjective_on_own_imageSet f domain b b_mem with ⟨a, a_mem, a_eq⟩
@@ -88,7 +91,7 @@ theorem imageSet_contained_of_closed
 
 /-- A mapping is surjective on a given domain and image if and only if the given image is contained in the actual image of the mapping. -/
 theorem surjective_on_target_iff_all_in_imageSet {f : α -> β} {domain : Set α} {target_image : Set β} :
-    f.surjectiveSet domain target_image ↔ ∀ b, b ∈ target_image -> b ∈ imageSet f domain := by
+    surjectiveSet f domain target_image ↔ ∀ b, b ∈ target_image -> b ∈ imageSet f domain := by
   constructor
   . intro surj b b_mem
     specialize surj b b_mem
@@ -119,7 +122,7 @@ def closedList (f : α -> α) (domain : List α) : Prop := ∀ a ∈ domain, f a
 
 /-- The injectivity definitions for set and list are interchangeable. -/
 theorem injective_set_list_equiv {f : α -> β} {domain_set : Set α} {domain_list : List α} (eq : ∀ e, e ∈ domain_set ↔ e ∈ domain_list) :
-    f.injectiveSet domain_set ↔ f.injectiveList domain_list := by
+    injectiveSet f domain_set ↔ injectiveList f domain_list := by
   constructor <;> (
     intro h a a' a_mem a'_mem f_eq
     apply h <;> grind
@@ -129,7 +132,7 @@ theorem injective_set_list_equiv {f : α -> β} {domain_set : Set α} {domain_li
 theorem surjective_set_list_equiv {f : α -> β}
     {domain_set : Set α} {domain_list : List α} (eq_domain : ∀ e, e ∈ domain_set ↔ e ∈ domain_list)
     {image_set : Set β} {image_list : List β} (eq_image : ∀ e, e ∈ image_set ↔ e ∈ image_list) :
-    f.surjectiveSet domain_set image_set ↔ f.surjectiveList domain_list image_list := by
+    surjectiveSet f domain_set image_set ↔ surjectiveList f domain_list image_list := by
   constructor <;> (
     intro h b b_mem
     rcases h b (by grind) with ⟨a, a_mem, a_eq⟩
@@ -137,7 +140,7 @@ theorem surjective_set_list_equiv {f : α -> β}
   )
 
 /-- If a mapping is injective on a domain of the form `hd::tl`, then it is injective on `tl`. -/
-theorem injectiveList_cons {f : α -> β} {hd : α} {tl : List α} : f.injectiveList (hd::tl) -> f.injectiveList tl := by
+theorem injectiveList_cons {f : α -> β} {hd : α} {tl : List α} : injectiveList f (hd::tl) -> injectiveList f tl := by
   rw [← injective_set_list_equiv (fun _ => (hd::tl).mem_toSet)]
   rw [← injective_set_list_equiv (fun _ => tl.mem_toSet)]
   intro inj
@@ -145,7 +148,7 @@ theorem injectiveList_cons {f : α -> β} {hd : α} {tl : List α} : f.injective
   intro _; grind
 
 /-- If a mapping is surjective on a domain `tl`, then it is surjective on any domain `hd::tl`. -/
-theorem surjectiveList_cons {f : α -> β} {hd : α} {tl : List α} {image : List β} : f.surjectiveList tl image -> f.surjectiveList (hd::tl) image := by
+theorem surjectiveList_cons {f : α -> β} {hd : α} {tl : List α} {image : List β} : surjectiveList f tl image -> surjectiveList f (hd::tl) image := by
   rw [← surjective_set_list_equiv (fun _ => tl.mem_toSet) (fun _ => image.mem_toSet)]
   rw [← surjective_set_list_equiv (fun _ => (hd::tl).mem_toSet) (fun _ => image.mem_toSet)]
   intro surj
@@ -153,12 +156,12 @@ theorem surjectiveList_cons {f : α -> β} {hd : α} {tl : List α} {image : Lis
   intro _; grind
 
 /-- Every mapping is always surjective on its own `imageList`. -/
-theorem surjective_on_own_imageList [DecidableEq β] (f : α -> β) (domain : List α) : f.surjectiveList domain (imageList f domain) := by
+theorem surjective_on_own_imageList [DecidableEq β] (f : α -> β) (domain : List α) : surjectiveList f domain (imageList f domain) := by
   intro b b_mem; simp only [imageList, List.mem_eraseDupsKeepRight, List.mem_map] at b_mem; exact b_mem
 
 /-- If a mapping is closed, then its image is fully contained in its domain. -/
 theorem imageList_contained_of_closed [DecidableEq α]
-    {f : α -> α} {domain : List α} (closed : f.closedList domain) :
+    {f : α -> α} {domain : List α} (closed : closedList f domain) :
     imageList f domain ⊆ domain := by
   intro b b_mem
   rcases surjective_on_own_imageList f domain b b_mem with ⟨a, a_mem, a_eq⟩
@@ -167,7 +170,7 @@ theorem imageList_contained_of_closed [DecidableEq α]
 
 /-- Given a mapping and a domain list without duplicates, the mapping in injective on the domain if and only if the `imageList` contains the same number of elements as the domain.  -/
 theorem injectiveList_iff_length_imageList_eq_of_nodup [DecidableEq β] {f : α -> β} {domain : List α} (nodup : domain.Nodup) :
-    f.injectiveList domain ↔ (imageList f domain).length = domain.length := by
+    injectiveList f domain ↔ (imageList f domain).length = domain.length := by
   constructor
   . intro inj
     suffices domain_nodup : (domain.map f).Nodup by
@@ -210,14 +213,14 @@ theorem injectiveList_iff_length_imageList_eq_of_nodup [DecidableEq β] {f : α 
 
 /-- A mapping is surjective on a given domain and image if and only if the given image is contained in the actual image of the mapping. -/
 theorem surjective_on_target_iff_all_in_imageList [DecidableEq β] {f : α -> β} {domain : List α} {target_image : List β} :
-    f.surjectiveList domain target_image ↔ ∀ b, b ∈ target_image -> b ∈ imageList f domain := by
+    surjectiveList f domain target_image ↔ ∀ b, b ∈ target_image -> b ∈ imageList f domain := by
   rw [← surjective_set_list_equiv (fun _ => domain.mem_toSet) (fun _ => target_image.mem_toSet)]
   rw [surjective_on_target_iff_all_in_imageSet]
   simp [imageList, imageSet]
 
 /-- Given a single list without duplicates that represents both domain and image, if a mapping is surjective, then it is injective. -/
 theorem injective_of_surjective_of_nodup [DecidableEq α] {f : α -> α} {l : List α} (nodup : l.Nodup) :
-    f.surjectiveList l l -> f.injectiveList l := by
+    surjectiveList f l l -> injectiveList f l := by
   intro surj
   rw [surjective_on_target_iff_all_in_imageList] at surj
   rw [injectiveList_iff_length_imageList_eq_of_nodup nodup]
@@ -228,7 +231,7 @@ theorem injective_of_surjective_of_nodup [DecidableEq α] {f : α -> α} {l : Li
 
 /-- Given a single list without duplicates that represents both domain and image, if a mapping closed on the list, then the mapping is injective if and only if it is surjective. -/
 theorem injective_iff_surjective_of_nodup_of_closed [DecidableEq α] {f : α -> α} {l : List α}
-    (nodup : l.Nodup) (closed : f.closedList l) : f.injectiveList l ↔ f.surjectiveList l l := by
+    (nodup : l.Nodup) (closed : closedList f l) : injectiveList f l ↔ surjectiveList f l l := by
   constructor
   . intro inj
     suffices ∀ e, e ∈ imageList f l ↔ e ∈ l by
@@ -248,7 +251,7 @@ theorem injective_iff_surjective_of_nodup_of_closed [DecidableEq α] {f : α -> 
 
 /-- Given a single list without duplicates that represents both domain and image, if a mapping both injective and surjective, then is must be closed on the list. -/
 theorem closed_of_injective_of_surjective_of_nodup [DecidableEq α] {f : α -> α} {l : List α} (nodup : l.Nodup) :
-    f.injectiveList l -> f.surjectiveList l l -> f.closedList l := by
+    injectiveList f l -> surjectiveList f l l -> closedList f l := by
   intro inj surj
   intro e e_mem
   rw [List.equiv_of_nodup_of_length_eq_of_subset l (imageList f l) nodup]

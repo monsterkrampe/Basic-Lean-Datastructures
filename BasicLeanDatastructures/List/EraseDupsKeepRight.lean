@@ -7,6 +7,9 @@ module
 
 import BasicLeanDatastructures.List.Nodup
 
+namespace CustomBasicDatastructures
+open CustomBasicDatastructures
+
 /-!
 # eraseDupsKeepRight
 
@@ -23,7 +26,7 @@ namespace List
 /-- Remove duplicates from a list, keeping the rightmost occurrense. -/
 def eraseDupsKeepRight [DecidableEq α] : List α -> List α
 | [] => []
-| hd::tl => if hd ∈ tl then tl.eraseDupsKeepRight else hd::(tl.eraseDupsKeepRight)
+| hd::tl => if hd ∈ tl then eraseDupsKeepRight tl else hd::(eraseDupsKeepRight tl)
 
 /-- The deduplicated list contains the same elements as the original list. -/
 @[simp, grind =]

@@ -5,6 +5,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 module
 
+namespace CustomBasicDatastructures
+
 /-!
 This file contains auxiliary results for lists without duplicates (which have the Nodup property).
 -/
@@ -30,7 +32,7 @@ theorem length_le_of_nodup_of_subset [DecidableEq α] (as bs : List α) (nodup :
   | nil => simp
   | cons a as ih =>
     let bs_without_a := bs.erase a
-    simp only [nodup_cons] at nodup
+    simp only [List.nodup_cons] at nodup
     specialize ih
       bs_without_a
       nodup.right
@@ -51,7 +53,7 @@ theorem equiv_of_nodup_of_length_eq_of_subset [DecidableEq α]
     | nil => cases bs; simp at mem_bs; simp at eq_length
     | cons a as ih =>
       let bs_without_a := bs.erase a
-      simp only [nodup_cons] at nodup
+      simp only [List.nodup_cons] at nodup
       specialize ih
         bs_without_a
         nodup.right
@@ -60,7 +62,7 @@ theorem equiv_of_nodup_of_length_eq_of_subset [DecidableEq α]
       cases Decidable.em (e = a) with
       | inl eq => simp [eq]
       | inr neq =>
-        simp only [mem_cons]; apply Or.inr
+        simp only [List.mem_cons]; apply Or.inr
         apply ih
         rw [List.mem_erase_of_ne]
         exact mem_bs
