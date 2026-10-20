@@ -86,6 +86,14 @@ theorem mem_map_of_mem {e : α} {X : Set α} {f : α -> β} : e ∈ X -> f e ∈
   intros
   exists e
 
+/-- Mapping a set with a function that is the id on all members yiels the original set. -/
+theorem map_id_of_id_on_all_mem {s : Set α} {f : α -> α} (id_on_all_mem : ∀ e, e ∈ s -> f e = e) : s.map f = s := by
+  apply ext; intro e; rw [mem_map]; grind
+
+/-- Mapping a set with the id function yields the original set. -/
+@[simp, grind =]
+theorem map_id {s : Set α} : s.map id = s := by apply map_id_of_id_on_all_mem; simp
+
 /-- The subset relation on sets is reflexive. -/
 theorem subset_refl {X : Set α} : X ⊆ X := by
   intros _ h
