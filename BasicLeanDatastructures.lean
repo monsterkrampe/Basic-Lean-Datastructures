@@ -7,6 +7,7 @@ module
 
 import BasicLeanDatastructures.FiniteTree
 import BasicLeanDatastructures.GetFreshInhabitant
+import BasicLeanDatastructures.Function.Composition
 import BasicLeanDatastructures.Function.Image
 import BasicLeanDatastructures.Function.InjectiveSurjective
 import BasicLeanDatastructures.Function.Repetition
