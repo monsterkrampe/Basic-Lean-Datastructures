@@ -55,6 +55,13 @@ theorem union_finite_of_both_finite [DecidableEq α] {a b : Set α} (fin_a : a.f
     . grind
     . intro h; cases h <;> grind
 
+/-- Mapping over a finite set yields a finite set. -/
+@[grind <-]
+theorem map_finite_of_finite [DecidableEq β] {a : Set α} {f : α -> β} : a.finite -> (a.map f).finite := by
+  intro ⟨l, _, l_eq⟩
+  exists (l.map f).eraseDupsKeepRight; constructor; apply List.nodup_eraseDupsKeepRight
+  intro e; rw [List.mem_eraseDupsKeepRight, List.mem_map, Set.mem_map]; simp [l_eq]
+
 end Set
 
 
